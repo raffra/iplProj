@@ -134,8 +134,8 @@ REPEATTEST = 5 # how many test on one trained classifier
 
 #class to be trained
 #trainWho = 3
-avgAcc = np.zeros((len(peopleName-1),len(NsamplePerBClass)))
-avgVarAcc = np.zeros((len(peopleName-1),len(NsamplePerBClass)))
+avgAcc = np.zeros((len(peopleName)-1,len(NsamplePerBClass)))
+avgVarAcc = np.zeros((len(peopleName)-1,len(NsamplePerBClass)))
 #figallacc = plt.pyplot.figure(figsize=(16,10),dpi=400)
 
 for trainWho in range(len(peopleName)-1):
@@ -315,4 +315,4 @@ axes = fig.gca()
 plt.pyplot.grid(True)
 plt.pyplot.show()
 fig.savefig(basepathsavefig +FeatTYPE+ "_"+ " average accuracy_p_N" + '.png', bbox_inches='tight',dpi=300)
-print('All done')   
+print('All done')    
