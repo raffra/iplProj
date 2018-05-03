@@ -127,9 +127,9 @@ folderName = ['testing','training','verification']
 #testing_gianni_feat.npy
 
 NsamplePerBClass = [25,50,100,200,400,800,1000] # how many samples for binary class
-NTEST = 5 # how many classifiers train for a sampleNumber
-TIMESVALID = 5 # how many validation for choosing a threshold
-REPEATTEST = 5 # how many test on one trained classifier
+NTEST = 20 # how many classifiers train for a sampleNumber
+TIMESVALID = 20 # how many validation for choosing a threshold
+REPEATTEST = 20 # how many test on one trained classifier
 
 
 #class to be trained
@@ -165,7 +165,7 @@ for trainWho in range(len(peopleName)-1):
     print("name,#testing,#training,#verification")
     for nameidx in range(len(peopleName)):
         print(peopleName[nameidx],testFeat[nameidx].shape[0],trainFeat[nameidx].shape[0],validFeat[nameidx].shape[0])
-    # all dataset loaded
+    print('dataset loaded')
     realNumberOfPeople = len(peopleName)-1
 
     fig = plt.pyplot.figure(figsize=(16,10),dpi=400)
@@ -173,6 +173,7 @@ for trainWho in range(len(peopleName)-1):
     p = np.arange(0,1,0.01)
     testRes = np.zeros(len(NsamplePerBClass))
     varianceForClassTest = []
+    # samples per class loop
     for Nsidx in range(len(NsamplePerBClass)):
         print("Use ",NsamplePerBClass[Nsidx])
         nsampleNow = NsamplePerBClass[Nsidx]
@@ -187,10 +188,9 @@ for trainWho in range(len(peopleName)-1):
             idxr = np.arange(negIdxTab.shape[0])
             negIdxTab =(negIdxTab*idxr)[negIdxTab == 1]
             smallTrainFeat,smallTrainLabel = createBinaryDataSet(trainWho,negIdxTab,trainFeat,NSampleForValid)
-            #done population of trainset
-            #print('Done Trainset!')
-            #print('Create svm model')
-            #model = svm.SVC(kernel='linear', c=1, gamma=1)
+            #print('Trainset done')
+
+            ######## PUT HERE YOUR CLASSIFIER TRAINING
             model = svm.SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
                 decision_function_shape='ovr', degree=3, gamma='auto', kernel='linear', #kernel='rgf' #overfit
                 max_iter=-1, probability=True, random_state=None, shrinking=True,
@@ -202,11 +202,10 @@ for trainWho in range(len(peopleName)-1):
             score = model.score(x_train, y_train)
             #print("Model accuracy",score)
             #joblib.dump(model, "svm_dlib.pkl") # save SVM
+            
+            
             #print('Start validation')
-            #create validation set
             veriaccuracy = np.zeros((TIMESVALID,p.shape[0]))
-
-
             for k in range(TIMESVALID): #repeat many times validation
                 smallValidFeat, smallValidLabels = createBinaryDataSet(trainWho,[realNumberOfPeople],validFeat,NSampleForTest)
                 #Validation set complete
@@ -223,6 +222,7 @@ for trainWho in range(len(peopleName)-1):
                     correctpred[j] = eqlabel[j]/y_veri.size
                 veriaccuracy[k] = correctpred.copy() # accuracy curve for this validation
 
+            # CHOOSE HYPERPARAMETER
             meanveriFun = np.mean(veriaccuracy,axis=0)
             best_th = np.argmax(meanveriFun) # manually selected
             choosedTh =  p[best_th]
@@ -238,7 +238,7 @@ for trainWho in range(len(peopleName)-1):
             #plt.pyplot.grid(True)
             #plt.pyplot.show()
 
-            #start test
+            #TESTING
             print('Testing')
             alltest = np.zeros((REPEATTEST,p.shape[0]))
             for jj in range(REPEATTEST):
@@ -254,9 +254,9 @@ for trainWho in range(len(peopleName)-1):
                 alltest[jj] = correctpred.copy()  
             testcurve[testN] = np.mean(alltest,axis=0).copy() #media dei test su tanti samples per un classificatore
 
-        meanTestFun = np.mean(testcurve,axis=0) # media su tanti classificatori
-        testRes[Nsidx] = meanTestFun[best_th] # sui classificatori accuratezza media con quella soglia
-        # plotta statistiche per quel numero di sample
+        meanTestFun = np.mean(testcurve,axis=0) # average on many classifiers
+        testRes[Nsidx] = meanTestFun[best_th] # select accuracy with precalculated threshold
+        # plot statistics for a sample number
         plt.pyplot.plot(p,meanTestFun,label=str(nsampleNow),color=cm.jet(Nsidx/len(NsamplePerBClass)))
         plt.pyplot.scatter(choosedTh,testRes[Nsidx],color=cm.jet(Nsidx/len(NsamplePerBClass)))
         plt.pyplot.text(choosedTh,testRes[Nsidx],str("%.2f"%testRes[Nsidx]),color=cm.jet(Nsidx/len(NsamplePerBClass)))
@@ -264,8 +264,7 @@ for trainWho in range(len(peopleName)-1):
         varianceForClassTest.append(varNow)
         plt.pyplot.errorbar(p[best_th],testRes[Nsidx],yerr=varNow,fmt='o',color=cm.jet(Nsidx/len(NsamplePerBClass)))
         print(testRes)
-
-
+        # end of sample number loop for one class
 
 
     plt.pyplot.title("Test accuracy(threshold), - " + FeatTYPE + "-  class: "+str(trainWho) + "_" + peopleName[trainWho],fontsize=30)
@@ -296,6 +295,7 @@ for trainWho in range(len(peopleName)-1):
     
     avgAcc[trainWho] = testRes.copy()
     avgVarAcc[trainWho] = np.asarray(varianceForClassTest)
+    # end of ID loop
 
 
 avgAccfinal = np.mean(avgAcc,axis=0)
@@ -315,4 +315,4 @@ axes = fig.gca()
 plt.pyplot.grid(True)
 plt.pyplot.show()
 fig.savefig(basepathsavefig +FeatTYPE+ "_"+ " average accuracy_p_N" + '.png', bbox_inches='tight',dpi=300)
-print('All done')    
+print('All done')  
