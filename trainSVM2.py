@@ -127,15 +127,15 @@ folderName = ['testing','training','verification']
 #testing_gianni_feat.npy
 
 NsamplePerBClass = [25,50,100,200,400,800,1000] # how many samples for binary class
-NTEST = 20 # how many classifiers train for a sampleNumber
-TIMESVALID = 20 # how many validation for choosing a threshold
-REPEATTEST = 20 # how many test on one trained classifier
+NTEST = 5 # how many classifiers train for a sampleNumber
+TIMESVALID = 5 # how many validation for choosing a threshold
+REPEATTEST = 5 # how many test on one trained classifier
 
 
 #class to be trained
 #trainWho = 3
-avgAcc = np.zeros((len(peopleName),len(NsamplePerBClass)))
-avgVarAcc = np.zeros((len(peopleName),len(NsamplePerBClass)))
+avgAcc = np.zeros((len(peopleName-1),len(NsamplePerBClass)))
+avgVarAcc = np.zeros((len(peopleName-1),len(NsamplePerBClass)))
 #figallacc = plt.pyplot.figure(figsize=(16,10),dpi=400)
 
 for trainWho in range(len(peopleName)-1):
@@ -297,8 +297,11 @@ for trainWho in range(len(peopleName)-1):
     avgAcc[trainWho] = testRes.copy()
     avgVarAcc[trainWho] = np.asarray(varianceForClassTest)
 
+
 avgAccfinal = np.mean(avgAcc,axis=0)
 avgVarAccfinal = np.mean(avgVarAcc,axis=0)
+print(avgAcc)
+print(avgVarAccfinal)
 
 fig = plt.pyplot.figure(figsize=(16,10),dpi=400)
 plt.pyplot.plot(np.asarray(NsamplePerBClass),avgAccfinal)
@@ -312,4 +315,4 @@ axes = fig.gca()
 plt.pyplot.grid(True)
 plt.pyplot.show()
 fig.savefig(basepathsavefig +FeatTYPE+ "_"+ " average accuracy_p_N" + '.png', bbox_inches='tight',dpi=300)
-print('All done')    
+print('All done')   
