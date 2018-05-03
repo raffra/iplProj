@@ -117,7 +117,7 @@ def CreatecolorTuple(f):
 
 ######################## START
 
-FeatTYPE = 'dlib' #openface o dlib
+FeatTYPE = 'openface' #openface o dlib
 typeOfFeat = FeatTYPE
 basepath = "/home/francesco/perLuca/sameImgs/" #folder feature condivise
 basepathsavefig = '/home/francesco/test_svm/'
@@ -243,6 +243,8 @@ for trainWho in range(len(peopleName)-1):
             alltest = np.zeros((REPEATTEST,p.shape[0]))
             for jj in range(REPEATTEST):
                 x_test,y_test = createBinaryDataSet(trainWho,[realNumberOfPeople],testFeat,NSampleForTest)
+                # RUN YOUR CLASSIFIER HERE
+                # the script expect a vector of real number, one for each class
                 predicted_proba = model.predict_proba(x_test)
                 boolmat = np.zeros((p.size,y_test.shape[0]))
                 eqlabel = np.zeros_like(p)
@@ -334,3 +336,4 @@ plt.pyplot.ylabel("var/acc",fontsize=20)
 plt.pyplot.grid(True)
 plt.pyplot.show()
 fig.savefig(basepathsavefig +FeatTYPE+ "_"+ " average varRatio_p_N" + '.png', bbox_inches='tight',dpi=300)
+print('All done')
