@@ -126,7 +126,7 @@ peopleName = ['gianni','stefano','sergio','jhilick','others']
 folderName = ['testing','training','verification']
 #testing_gianni_feat.npy
 
-NsamplePerBClass = [25,50,100,200,400,800,1000] # how many samples for binary class
+NsamplePerBClass = [25,50,100,200,400,600,800,1000,1100] # how many samples for binary class
 NTEST = 20 # how many classifiers train for a sampleNumber
 TIMESVALID = 20 # how many validation for choosing a threshold
 REPEATTEST = 20 # how many test on one trained classifier
@@ -307,12 +307,30 @@ fig = plt.pyplot.figure(figsize=(16,10),dpi=400)
 plt.pyplot.plot(np.asarray(NsamplePerBClass),avgAccfinal)
 plt.pyplot.errorbar(np.asarray(NsamplePerBClass),avgAccfinal,yerr=avgVarAccfinal,fmt='o')
 
+for i in range(len(avgAccfinal)):
+    plt.pyplot.text(np.asarray(NsamplePerBClass)[i],avgAccfinal[i],np.asarray(str("%.3f"%avgAccfinal[i])),color='k',fontsize=13)
+    plt.pyplot.text(np.asarray(NsamplePerBClass)[i],
+                    avgAccfinal[i]+avgVarAccfinal[i],
+                    np.asarray(str("%.4f"%(avgVarAccfinal[i]))),color='k',fontsize=13)
+
 plt.pyplot.title('Average Accuracy(Samples per class) - ' + FeatTYPE,fontsize=25)
 plt.pyplot.xlabel('Samples per binary class during training',fontsize=20)
 plt.pyplot.ylabel("Accuracy",fontsize=20)
-axes = fig.gca()
+#axes = fig.gca()
 #axes.set_ylim([0.8,1])
 plt.pyplot.grid(True)
 plt.pyplot.show()
 fig.savefig(basepathsavefig +FeatTYPE+ "_"+ " average accuracy_p_N" + '.png', bbox_inches='tight',dpi=300)
-print('All done')  
+
+
+fig = plt.pyplot.figure(figsize=(16,10),dpi=400)
+plt.pyplot.plot(np.asarray(NsamplePerBClass),avgVarAccfinal/avgAccfinal)
+
+plt.pyplot.title('Average var/acc ' + FeatTYPE,fontsize=25)
+plt.pyplot.xlabel('Samples per binary class during training',fontsize=20)
+plt.pyplot.ylabel("var/acc",fontsize=20)
+#axes = fig.gca()
+#axes.set_ylim([0.8,1])
+plt.pyplot.grid(True)
+plt.pyplot.show()
+fig.savefig(basepathsavefig +FeatTYPE+ "_"+ " average varRatio_p_N" + '.png', bbox_inches='tight',dpi=300)
